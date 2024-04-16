@@ -52,7 +52,7 @@ fun AmphibianApp() {
         topBar = { AmphibiansTopBar() }
     ) {it ->
 
-        val viewmodel: AmphibiansViewModel = viewModel()
+        val viewmodel: AmphibiansViewModel = viewModel(factory = AmphibiansViewModel.factory)
        AmphibiansHomeScreen(
            amphibiansNetworkResponse = viewmodel.amphibianNetworkResponse,
            retryAction = { viewmodel.getAmphibiansData() },
@@ -126,7 +126,8 @@ fun AmphibiansListScreen(
 
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Adaptive(300.dp),
-        contentPadding = contentPadding
+        contentPadding = contentPadding,
+        modifier = modifier
     ) {
         items(amphibiansNetworkResponse.amphibians){
             AmphibianCard(modifier = Modifier.padding(5.dp), amphibian = it)

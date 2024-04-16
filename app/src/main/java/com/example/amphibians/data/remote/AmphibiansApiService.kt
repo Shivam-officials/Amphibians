@@ -13,15 +13,5 @@ interface AmphibiansApiService {
     suspend fun getAmphibiansData():List<Amphibian>
 }
 
-private const val BASE_URL = "https://android-kotlin-fun-mars-server.appspot.com/"
 
-val retrofit = Retrofit.Builder()
-    .baseUrl(BASE_URL)
-    .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
-    .build()
 
-object AmphibiansApi {
-    val retrofitService: AmphibiansApiService by lazy {
-        retrofit.create(AmphibiansApiService::class.java)
-    }
-}
