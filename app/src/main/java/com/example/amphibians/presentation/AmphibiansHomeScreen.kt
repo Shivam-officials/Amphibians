@@ -8,24 +8,26 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,29 +37,54 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.amphibians.R
 import com.example.amphibians.data.remote.model.Amphibian
 
+
+@Composable
+fun AmphibianApp() {
+
+    Scaffold(
+
+        topBar = { AmphibiansTopBar() }
+    ) {it ->
+
+        val viewmodel: AmphibiansViewModel = viewModel()
+       AmphibiansHomeScreen(
+           amphibiansNetworkResponse = viewmodel.amphibianNetworkResponse,
+           retryAction = { viewmodel.getAmphibiansData() },
+           contentPadding = it
+       )
+    }
+}
+
 @Composable
 fun AmphibiansHomeScreen(
     amphibiansNetworkResponse: AmphibiansNetworkResponse,
     retryAction: () -> Unit,
-    modifier:Modifier = Modifier
+    modifier:Modifier = Modifier,
+    contentPadding: PaddingValues
 ) {
     
     when(amphibiansNetworkResponse){
         is AmphibiansNetworkResponse.Loading -> {
-            LoadingScreen(modifier.fillMaxSize())
+            LoadingScreen(contentPadding,modifier.fillMaxSize())
         }
         is AmphibiansNetworkResponse.Success -> {
-            AmphibiansListScreen(modifier,amphibiansNetworkResponse)
+            AmphibiansListScreen(
+                modifier,
+                amphibiansNetworkResponse,
+                contentPadding = contentPadding
+            )
         }
         is AmphibiansNetworkResponse.Error -> {
             ErrorScreen(
+                contentPadding,
                 retryAction,
-                modifier = modifier
+                modifier = modifier.fillMaxSize()
             )
         }
     }
@@ -67,12 +94,13 @@ fun AmphibiansHomeScreen(
 
 @Composable
 fun ErrorScreen(
-    retryAction : ()-> Unit,
+    contentPadding: PaddingValues,
+    retryAction: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 //    TODO("Not yet implemented")
     Column(
-        modifier = modifier,
+        modifier = modifier.padding(contentPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -91,13 +119,14 @@ fun ErrorScreen(
 @Composable
 fun AmphibiansListScreen(
     modifier: Modifier,
-    amphibiansNetworkResponse: AmphibiansNetworkResponse.Success
+    amphibiansNetworkResponse: AmphibiansNetworkResponse.Success,
+    contentPadding: PaddingValues = PaddingValues(10.dp)
 ) {
 //    TODO("Not yet implemented")
 
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Adaptive(300.dp),
-        contentPadding = PaddingValues(10.dp)
+        contentPadding = contentPadding
     ) {
         items(amphibiansNetworkResponse.amphibians){
             AmphibianCard(modifier = Modifier.padding(5.dp), amphibian = it)
@@ -151,13 +180,22 @@ private fun AmphibianCard(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoadingScreen(modifier: Modifier = Modifier) {
+fun AmphibiansTopBar() {
+    CenterAlignedTopAppBar(
+        title = { Text(text = stringResource(id = R.string.app_name)) },
+        colors = TopAppBarDefaults.topAppBarColors().copy(containerColor = MaterialTheme.colorScheme.primaryContainer)
+    )
+}
+
+@Composable
+fun LoadingScreen(contentPadding: PaddingValues, modifier: Modifier = Modifier) {
 //    TODO("Not yet implemented")
     Image(
         painter = painterResource(id = R.drawable.loading_img),
         contentDescription = null,
-        modifier = modifier
+        modifier = modifier.padding(contentPadding)
         )
 }
 
@@ -170,7 +208,7 @@ private fun LoadingScreenPreview() {
 @Preview(showSystemUi = true,)
 @Composable
 private fun ErrorScreenPreview() {
-    ErrorScreen({},Modifier.fillMaxSize())
+    ErrorScreen(PaddingValues(5.dp), {}, Modifier.fillMaxSize())
 }
 
 @Preview(showSystemUi = true)

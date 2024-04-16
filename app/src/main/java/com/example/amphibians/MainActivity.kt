@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.amphibians.presentation.AmphibianApp
 import com.example.amphibians.presentation.AmphibiansHomeScreen
 import com.example.amphibians.presentation.AmphibiansNetworkResponse
 import com.example.amphibians.presentation.AmphibiansViewModel
@@ -29,11 +30,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val viewmodel: AmphibiansViewModel = viewModel()
-                    AmphibiansHomeScreen(
-                        modifier = Modifier.padding(10.dp),
-                        retryAction = {viewmodel.getAmphibiansData()},
-                        amphibiansNetworkResponse = viewmodel.amphibianNetworkResponse
-                    )
+                    AmphibianApp()
                 }
             }
         }
