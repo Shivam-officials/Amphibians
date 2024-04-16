@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Button
@@ -26,11 +25,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -44,14 +44,14 @@ import com.example.amphibians.R
 import com.example.amphibians.data.remote.model.Amphibian
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AmphibianApp() {
-
+fun AmphibianApp(modifier: Modifier = Modifier) {
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
-
-        topBar = { AmphibiansTopBar() }
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = { AmphibiansTopBar(scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()) }
     ) {it ->
-
         val viewmodel: AmphibiansViewModel = viewModel(factory = AmphibiansViewModel.factory)
        AmphibiansHomeScreen(
            amphibiansNetworkResponse = viewmodel.amphibianNetworkResponse,
@@ -183,8 +183,9 @@ private fun AmphibianCard(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AmphibiansTopBar() {
+fun AmphibiansTopBar(scrollBehavior: TopAppBarScrollBehavior) {
     CenterAlignedTopAppBar(
+        scrollBehavior = scrollBehavior,
         title = { Text(text = stringResource(id = R.string.app_name)) },
         colors = TopAppBarDefaults.topAppBarColors().copy(containerColor = MaterialTheme.colorScheme.primaryContainer)
     )
@@ -200,7 +201,7 @@ fun LoadingScreen(contentPadding: PaddingValues, modifier: Modifier = Modifier) 
         )
 }
 
-@Preview(showSystemUi = true,)
+@Preview(showSystemUi = true)
 @Composable
 private fun LoadingScreenPreview() {
     (Modifier.fillMaxSize())
